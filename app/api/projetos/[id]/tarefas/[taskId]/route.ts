@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { toggleTask, deleteTask, updateTask } from "@/lib/store"
+import { readJson } from "@/lib/http"
 
 export async function PATCH(
   request: Request,
@@ -7,19 +8,15 @@ export async function PATCH(
 ) {
   const { id, taskId } = await params
 
-  // O toggle envia PATCH sem body; a edição de título envia { title }.
-  let body: { title?: string } = {}
-  try {
-    body = await request.json()
-  } catch {
-    body = {}
-  }
-
-  if (typeof body.title === "string") {
-    if (!body.title.trim()) {
+  // Sem a chave `title` (ex.: PATCH sem corpo) → alterna o `done`.
+  // Com `title` → edita o título (e valida que é uma string não vazia).
+  const body = await readJson(request)
+  if ("title" in body) {
+    const { title } = body
+    if (typeof title !== "string" || !title.trim()) {
       return NextResponse.json({ error: "Título é obrigatório" }, { status: 400 })
     }
-    const task = updateTask(id, taskId, body.title.trim())
+    const task = updateTask(id, taskId, title.trim())
     if (!task) return NextResponse.json({ error: "Tarefa não encontrada" }, { status: 404 })
     return NextResponse.json(task)
   }

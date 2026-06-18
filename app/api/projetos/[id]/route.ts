@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server"
 import { deleteProject, updateProject } from "@/lib/store"
+import { readJson } from "@/lib/http"
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const body = await request.json()
-  const { name, description } = body
-  if (!name?.trim()) {
+  const { name, description } = await readJson(request)
+  if (typeof name !== "string" || !name.trim()) {
     return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 })
   }
-  const project = updateProject(id, name.trim(), description?.trim() ?? "")
+  const desc = typeof description === "string" ? description.trim() : ""
+  const project = updateProject(id, name.trim(), desc)
   if (!project) {
     return NextResponse.json({ error: "Projeto não encontrado" }, { status: 404 })
   }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { listTasks, createTask, getProject } from "@/lib/store"
+import { readJson } from "@/lib/http"
 
 export async function GET(
   _request: Request,
@@ -17,9 +18,8 @@ export async function POST(
   if (!getProject(id)) {
     return NextResponse.json({ error: "Projeto não encontrado" }, { status: 404 })
   }
-  const body = await request.json()
-  const { title } = body
-  if (!title?.trim()) {
+  const { title } = await readJson(request)
+  if (typeof title !== "string" || !title.trim()) {
     return NextResponse.json({ error: "Título é obrigatório" }, { status: 400 })
   }
   const task = createTask(id, title.trim())

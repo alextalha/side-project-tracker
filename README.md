@@ -105,8 +105,13 @@ totalmente reiniciado** — é um tracker propositalmente _in-memory_, sem banco
 ## Testes
 
 ```bash
-pnpm test
+pnpm test            # roda a suíte
+pnpm test:watch      # modo watch
+pnpm test:coverage   # com relatório de cobertura (+ thresholds)
 ```
 
-Os testes unitários cobrem as rotas de API (CRUD de projetos e tarefas, validações e
-códigos de status). Veja a pasta `tests/`.
+Os testes unitários (Vitest) cobrem as rotas de API e a lógica do store: CRUD de projetos e
+tarefas, validações (`400`/`404`), `toggle` vs. edição de título, cascade no delete, corpo
+JSON inválido/ausente e isolamento entre projetos. Veja a pasta `tests/`.
+
+A cada push/PR, o workflow em `.github/workflows/ci.yml` roda `pnpm install` + `pnpm test:coverage`.

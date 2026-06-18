@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { listProjects, createProject, countTasks } from "@/lib/store"
+import { readJson } from "@/lib/http"
 
 export async function GET() {
   const projects = listProjects()
@@ -8,11 +9,11 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json()
-  const { name, description } = body
-  if (!name?.trim()) {
+  const { name, description } = await readJson(request)
+  if (typeof name !== "string" || !name.trim()) {
     return NextResponse.json({ error: "Nome é obrigatório" }, { status: 400 })
   }
-  const project = createProject(name.trim(), description?.trim() ?? "")
+  const desc = typeof description === "string" ? description.trim() : ""
+  const project = createProject(name.trim(), desc)
   return NextResponse.json(project, { status: 201 })
 }
