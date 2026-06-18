@@ -170,3 +170,9 @@ export function countTasks(projectId: string): number {
 export function countCompletedTasks(projectId: string): number {
   return Array.from(tasks.values()).filter((t) => t.projectId === projectId && t.done).length
 }
+
+// Apenas para testes: zera o store entre os casos para garantir isolamento.
+export function __clearStore(): void {
+  projects.clear()
+  tasks.clear()
+}
